@@ -1,4 +1,5 @@
 ﻿using System;
+using BookBank_Api.Helpers;
 using BookBank_Api.Models;
 using MongoDB.Driver;
 
@@ -7,6 +8,7 @@ namespace BookBank_Api.Services
 	public class AuthService
 	{
         private IMongoCollection<UserModel> _users;
+        BcryptPassword _bcriotPassword = new BcryptPassword();
 
         public AuthService(IDatabaseSettings settings)
         {
@@ -15,39 +17,28 @@ namespace BookBank_Api.Services
             _users = database.GetCollection<UserModel>(settings.Collection);
         }
 
-        public List<UserModel> Get()
+        public UserModel Login(LoginModel user)
         {
-            // retorna todos los usuarios usando el lambda y pniendolo en true
-            return _users.Find(d => true).ToList();
-        }
+            // Crea un filtro para buscar el usuario por email
+            var filter = Builders<UserModel>.Filter.Eq(u => u.email, user.email);
 
-        public UserModel Create(UserModel user)
-        {
-            // Check for duplicate email
-            var existingUser = _users.Find(u => u.email == user.email).FirstOrDefault();
-            if (existingUser != null)
+            // retorna todos los usuarios usando el lambda y pniendolo en true
+            UserModel usuarioBd = _users.Find(filter).FirstOrDefault();
+
+            if (usuarioBd == null)
             {
-                // If a user with the same email already exists, return false to indicate a conflict
                 return null;
             }
 
-            // Insert the new user
-            _users.InsertOne(user);
+            if (_bcriotPassword.VerifyPassword(user.password, usuarioBd.password) == false)
+            {
+                return null;
+            }
 
-            // Return the newly created user
-            return user;
+
+
+            return usuarioBd;
         }
-
-        public void Uodate(string id, UserModel user)
-        {
-            _users.ReplaceOne(user => user.Id == id, user);
-        }
-
-        public void Delete(string id)
-        {
-            _users.DeleteOne(d => d.Id == id);
-        }
-
     }
 }
 

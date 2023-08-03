@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BookBank_Api.Models;
 using BookBank_Api.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookBank_Api.Controllers
@@ -13,25 +10,25 @@ namespace BookBank_Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        public AuthService _authService;
+        public UserService _userService;
 
-        public UserController(AuthService authService)
+        public UserController(UserService userService)
         {
-            _authService = authService;
+            _userService = userService;
         }
 
         [HttpGet]
+        [Authorize]
         public ActionResult<List<UserModel>> Get()
         {
-            return _authService.Get();
+            return _userService.Get();
         }
 
         [HttpPost]
         public ActionResult<UserModel> Create(UserModel user)
         {
-            
 
-            if (_authService.Create(user) == null)
+            if (_userService.Create(user) == null)
             {
                 return BadRequest();
             }
@@ -42,14 +39,14 @@ namespace BookBank_Api.Controllers
         [HttpPut]
         public ActionResult Update(UserModel user)
         {
-            _authService.Uodate(user.Id, user);
+            _userService.Uodate(user.Id!, user);
             return Ok();
         }
 
         [HttpDelete("{id}")]
         public ActionResult Delete(string id)
         {
-            _authService.Delete(id);
+            _userService.Delete(id);
             var response = new
             {
                 msg = $"Eliminado Correctamente el usuario con el ID: {id}!!!!"

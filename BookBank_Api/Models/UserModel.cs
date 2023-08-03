@@ -24,6 +24,9 @@ namespace BookBank_Api.Models
         [BsonElement("phone")]
         public string phone { get; set; } = null!;
 
+        [BsonElement("password")]
+        public string password { get; set; } = null!;
+
         [BsonElement("created_at")]
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)] // O puedes usar Kind = DateTimeKind.Utc si prefieres guardar la fecha en UTC.
         public DateTime? created_at { get; set; } = DateTime.Now;
