@@ -18,7 +18,12 @@ namespace BookBank_Api.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        // esto es apra proteger un ruta en base al token
+        //[Authorize]
+        // revisa el token y el Rol del usaurio.
+
+        [Authorize(Roles = ("Admin"))]
+
         public ActionResult<List<UserModel>> Get()
         {
             return _userService.Get();
